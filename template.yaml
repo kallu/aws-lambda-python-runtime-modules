@@ -24,9 +24,14 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       InlineCode: |
+        # https://gist.github.com/gene1wood/4a052f39490fae00e0c3
+
+        import importlib.metadata
+
         def lambda_handler(event, context):
-            response_text = "Lambda Function Debug Info\n"
-            response_text += "=============================\n\n"
+            dists = set([tuple(str(d._path).split('/')[-1].replace('.dist-info', '').rsplit('-', 1)) for d in importlib.metadata.distributions()])
+            reqs = sorted([f'{dist}~={version}' for (dist,version) in dists])
+            response_text='\n'.join(reqs)
             
             return {
                 'statusCode': 200,
