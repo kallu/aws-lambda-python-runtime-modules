@@ -32,7 +32,7 @@ jobs:
         aws-region: eu-west-1
     - name: Update local artefacts
       run: |
-        aws sts get-caller-identity
+       ./update.sh
 #    - name: Get current date
 #      id: date 
 #      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
