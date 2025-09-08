@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Python function to dump modules provided in runtime
+
+Parameters:
+  PythonRuntime:
+    Type: String
+    Default: python3.13
+
+  Architecture:
+    Type: String
+    Default: arm64
+    AllowedValues: 
+      - arm64
+      - x86_64
+
+Globals:
+  Function:
+    Timeout: 10
+    MemorySize: 128
+
+Resources:
+  DumpPythonModules:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        def lambda_handler(event, context):
+            response_text = "Lambda Function Debug Info\n"
+            response_text += "=============================\n\n"
+            
+            return {
+                'statusCode': 200,
+                'headers': {
+                    'Content-Type': 'text/plain'
+                },
+                'body': response_text
+            }
+      Handler: index.lambda_handler
+      Runtime: !Ref PythonRuntime
+      Architectures:
+        - !Ref Architecture
+      FunctionUrlConfig:
+        AuthType: NONE
+
+Outputs:
+  Function:
+    Value: !GetAtt DumpPythonModules.Arn
+  FunctionUrl:
+    Value: !GetAtt DumpPythonModulesUrl.FunctionUrl
