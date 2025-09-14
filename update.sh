@@ -21,7 +21,7 @@ do
   aws cloudformation update-stack \
     --stack-name ${STACK_NAME} \
     --use-previous-template \
-    --parameters \
+    --parameters ParameterKey=PythonRuntime,ParameterValue=${R} \
     --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM
 
   aws cloudformation wait stack-update-complete \
