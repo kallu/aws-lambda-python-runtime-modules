@@ -4,18 +4,6 @@ RUNTIMES=./runtimes
 STACK_NAME=python-runtime-dump
 TEMPLATE=template.yaml
 
-#aws cloudformation create-stack \
-#  --stack-name ${STACK_NAME} \
-#  --template-body file://${TEMPLATE} \
-#  --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM || true
-
-#aws cloudformation wait stack-create-complete \
-#  --stack-name ${STACK_NAME}
-
-#FUNCTION_URL=$(aws cloudformation describe-stacks \
-#  --stack-name ${STACK_NAME} \
-#  --query 'Stacks[0].Outputs[]' | jq -r '.[] | select(.OutputKey=="FunctionUrl").OutputValue')
-
 for R in $(cat runtimes)
 do
   aws cloudformation deploy \
@@ -25,10 +13,21 @@ do
     --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM \
     --no-fail-on-empty-changeset
 
-  sleep 5
-
-  aws cloudformation wait stack-update-complete \
+  aws cloudformation wait stack-exists\
     --stack-name ${STACK_NAME}
+
+  # Wait until stack is created or updated
+
+  while true
+  do
+    STACK_STATUS=$(aws cloudformation describe-stacks \
+      --stack-name ${STACK_NAME} \
+      --query 'Stacks[0].StackStatus' \
+      --output text)
+    echo "Stack status $(STACK_STATUS)"
+    [[ "$(STACK_STATUS)" == *_COMPLETE ]] && break
+    sleep 5
+  done
 
   FUNCTION_URL=$(aws cloudformation describe-stacks \
     --stack-name ${STACK_NAME} \
