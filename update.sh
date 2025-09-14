@@ -27,7 +27,7 @@ do
   aws cloudformation wait stack-update-complete \
     --stack-name ${STACK_NAME}
 
-  curl ${FUNCION_URL} -o ${R}-requirements.txt
+  curl ${FUNCTION_URL} -o ${R}-requirements.txt
 done
 
 aws cloudformation delete-stack \
