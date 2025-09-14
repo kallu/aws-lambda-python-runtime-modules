@@ -12,16 +12,16 @@ TEMPLATE=template.yaml
 #aws cloudformation wait stack-create-complete \
 #  --stack-name ${STACK_NAME}
 
-FUNCTION_URL=$(aws cloudformation describe-stacks \
-  --stack-name ${STACK_NAME} \
-  --query 'Stacks[0].Outputs[]' | jq -r '.[] | select(.OutputKey=="FunctionUrl").OutputValue')
+#FUNCTION_URL=$(aws cloudformation describe-stacks \
+#  --stack-name ${STACK_NAME} \
+#  --query 'Stacks[0].Outputs[]' | jq -r '.[] | select(.OutputKey=="FunctionUrl").OutputValue')
 
 for R in $(cat runtimes)
 do
   aws cloudformation deploy \
     --stack-name ${STACK_NAME} \
-    --template-body file://${TEMPLATE} \
-    --parameters ParameterKey=PythonRuntime,ParameterValue=${R} \
+    --template-file ${TEMPLATE} \
+    --parameter-overrides PythonRuntime=${R} \
     --capabilities CAPABILITY_AUTO_EXPAND CAPABILITY_IAM CAPABILITY_NAMED_IAM \
     --no-fail-on-empty-changeset
 
